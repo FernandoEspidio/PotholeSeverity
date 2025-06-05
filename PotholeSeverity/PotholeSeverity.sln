@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PotholeSeverity.Classifier", "PotholeSeverity.Classifier", "{007688A0-FFD7-4C6A-AC8D-4808F03FCBB0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PotholeSeverity.Classifier", "PotholeSeverity.Classifier\PotholeSeverity.Classifier\PotholeSeverity.Classifier.csproj", "{78DFDECC-4D9B-478A-8D9A-6EBDB8538D62}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PotholeSeverity.Classifier", "PotholeSeverity.Classifier\PotholeSeverity.Classifier.csproj", "{89785384-EF51-4A84-997C-B778F6E636DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,12 +17,9 @@ Global
 		SolutionGuid = {C96DF530-5B4F-4CE2-ABF2-3864A2208374}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{78DFDECC-4D9B-478A-8D9A-6EBDB8538D62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{78DFDECC-4D9B-478A-8D9A-6EBDB8538D62}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{78DFDECC-4D9B-478A-8D9A-6EBDB8538D62}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{78DFDECC-4D9B-478A-8D9A-6EBDB8538D62}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{78DFDECC-4D9B-478A-8D9A-6EBDB8538D62} = {007688A0-FFD7-4C6A-AC8D-4808F03FCBB0}
+		{89785384-EF51-4A84-997C-B778F6E636DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89785384-EF51-4A84-997C-B778F6E636DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89785384-EF51-4A84-997C-B778F6E636DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89785384-EF51-4A84-997C-B778F6E636DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
