@@ -5,6 +5,12 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PotholeSeverity.Classifier", "PotholeSeverity.Classifier\PotholeSeverity.Classifier.csproj", "{89785384-EF51-4A84-997C-B778F6E636DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PotholeSeverity.Api", "PotholeSeverity.Api\PotholeSeverity.Api.csproj", "{7A518CCC-0516-4B31-BC84-D8474872DE64}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PotholeSeverity.Application", "PotholeSeverity.Application\PotholeSeverity.Application.csproj", "{5F2763C7-782B-4E22-9553-7F2A5D54D58F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PotholeSeverity.Contracts", "PotholeSeverity.Contracts\PotholeSeverity.Contracts.csproj", "{51D4A498-92D6-40FB-9CDC-F67DE9ABD484}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,5 +27,17 @@ Global
 		{89785384-EF51-4A84-997C-B778F6E636DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89785384-EF51-4A84-997C-B778F6E636DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89785384-EF51-4A84-997C-B778F6E636DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A518CCC-0516-4B31-BC84-D8474872DE64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A518CCC-0516-4B31-BC84-D8474872DE64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A518CCC-0516-4B31-BC84-D8474872DE64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A518CCC-0516-4B31-BC84-D8474872DE64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F2763C7-782B-4E22-9553-7F2A5D54D58F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F2763C7-782B-4E22-9553-7F2A5D54D58F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F2763C7-782B-4E22-9553-7F2A5D54D58F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F2763C7-782B-4E22-9553-7F2A5D54D58F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51D4A498-92D6-40FB-9CDC-F67DE9ABD484}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51D4A498-92D6-40FB-9CDC-F67DE9ABD484}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51D4A498-92D6-40FB-9CDC-F67DE9ABD484}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51D4A498-92D6-40FB-9CDC-F67DE9ABD484}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
