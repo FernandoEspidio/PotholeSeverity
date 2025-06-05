@@ -1,98 +1,127 @@
 # Pothole Severity Classification with ML.NET
 
-This project is an AI-powered pothole severity classifier built using **ML.NET** on **Linux (no Visual Studio required)**. It uses transfer learning to classify road images containing potholes into three severity levels: **low**, **medium**, and **high**. This helps prioritize road maintenance based on pothole danger levels.
+This project is an AI-powered pothole severity classifier built using **ML.NET** on **Linux (no Visual Studio required)**.
+It uses transfer learning to classify road images containing potholes into three severity levels: **low**, **medium**, and **high**.
+The model helps road-maintenance teams prioritize repairs based on risk.
 
-## 🔍 Project Overview
+## Project Overview
 
-* **Input**: Road surface images (JPEG/PNG)
-* **Output**: Predicted pothole severity label (`low`, `medium`, or `high`)
-* **Framework**: [ML.NET](https://dotnet.microsoft.com/en-us/apps/machinelearning-ai/ml-dotnet)
-* **Platform**: Linux, using .NET CLI
-* **Model Type**: Image classification (transfer learning with pre-trained CNN)
+* **Input**: Road-surface images (JPG / PNG)
+* **Output**: Predicted pothole severity label – `low`, `medium`, or `high`
+* **Framework**: ML.NET
+* **Platform**: Linux, using the .NET CLI
+* **Model**: Image classification (ResNet-based transfer learning)
 
-## 📁 Dataset Used
+## Dataset
 
-We used the [**Annotated Potholes with Severity Levels**](https://www.kaggle.com/datasets/idanbaru/annotated-potholes-with-severity-levels) dataset by **Idan Baruch**, published on Kaggle.
+* **Source** – Annotated Potholes with Severity Levels by Idan Baruch on Kaggle
+  [https://www.kaggle.com/datasets/idanbaru/annotated-potholes-with-severity-levels](https://www.kaggle.com/datasets/idanbaru/annotated-potholes-with-severity-levels)
+* **License** – Creative Commons Attribution 4.0 (CC BY 4.0)
 
-**License**: Creative Commons Attribution 4.0 International ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/))
+**Attribution**
+Baruch, I. “Annotated Potholes with Severity Levels.” Kaggle, 2023.
+Images were reorganized automatically for training; no other dataset content was modified.
 
-**Attribution**:
-*Baruch, Idan. "Annotated Potholes with Severity Levels." Kaggle, 2023. [https://www.kaggle.com/datasets/idanbaru/annotated-potholes-with-severity-levels](https://www.kaggle.com/datasets/idanbaru/annotated-potholes-with-severity-levels)*
-Images were reorganized by severity class for training. No other content was modified.
+## Installation & Setup (Linux)
 
-## 🛠️ Installation & Setup (Linux)
+### 1. Prerequisites
 
-### Prerequisites
+* .NET SDK 6.0 or later
+* Optional: build tools (`gcc`, `make`) if you need to manually install TensorFlow libs
 
-* [.NET SDK 6.0 or later](https://dotnet.microsoft.com/download)
-* Optional: [ML.NET CLI](https://learn.microsoft.com/en-us/dotnet/machine-learning/automate-training-with-cli)
-
-### Install ML.NET packages
+### 2. Create the project & install ML.NET + TensorFlow runtime
 
 ```bash
-dotnet new console -n PotholeSeverityClassifier
-cd PotholeSeverityClassifier
+dotnet new console -n PotholeSeverity.Classifier
+cd PotholeSeverity.Classifier
+
+# ML.NET packages
 dotnet add package Microsoft.ML
 dotnet add package Microsoft.ML.ImageAnalytics
 dotnet add package Microsoft.ML.Vision
+
+# Native TensorFlow C bindings
+dotnet add package SciSharp.TensorFlow.Redist --version 2.3.0
 ```
 
-## 🗃️ Data Preparation
+### 3. TensorFlow setup (if errors persist)
 
-1. **Download dataset** from Kaggle:
-   [https://www.kaggle.com/datasets/idanbaru/annotated-potholes-with-severity-levels](https://www.kaggle.com/datasets/idanbaru/annotated-potholes-with-severity-levels)
+If you still get `libtensorflow.so not found`:
 
-2. **Create folders** based on severity levels:
+Option 1 – Use the NuGet package (above), and confirm this file exists after `dotnet build`:
+
+```
+bin/Debug/net*/runtimes/linux-x64/native/libtensorflow.so
+```
+
+Option 2 – Install TensorFlow manually system-wide:
 
 ```bash
-mkdir -p Data/low Data/medium Data/high
+wget https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-2.3.0.tar.gz
+sudo tar -C /usr/local -xzf libtensorflow-cpu-linux-x86_64-2.3.0.tar.gz
+sudo ldconfig
 ```
 
-3. **Reorganize images** by reading the CSV annotations and placing each image in the correct folder based on its severity label.
+Then make sure `/usr/local/lib` is in your `LD_LIBRARY_PATH`.
 
-4. Final folder structure should look like:
+## Data Preparation
+
+1. Download the Kaggle dataset and extract it to the root of your project:
 
 ```
-PotholeSeverityClassifier/
-└── Data/
-    ├── low/
-    ├── medium/
-    └── high/
+archive/
+├── images/        # 717 image files
+└── annotations/   # 717 XML files
 ```
 
-## 🧠 Training the Model
+2. Do **not** move or relabel files manually.
 
-1. Copy the training code into `Program.cs` (from this project).
-2. Train the model:
+Our `Program.cs` parses each XML annotation file and auto-assigns the highest-severity pothole label found in that image.
+
+## Training
+
+Run the project:
 
 ```bash
 dotnet run
 ```
 
-3. The trained model (`PotholeSeverityModel.zip`) will be saved for reuse.
-
-## 📊 Evaluation Output Example
+Sample output from a real run:
 
 ```
-MicroAccuracy: 0.89
-MacroAccuracy: 0.86
-LogLoss: 0.42
+Loaded 701 annotated images.
+Training… (this can take several minutes on CPU)
+✔ Training finished.
+
+Micro-Accuracy : 78.38%
+Macro-Accuracy : 54.58%
+LogLoss        : 0.7024
+Model saved to PotholeSeverityModel.zip
+
+Sample prediction for 'img-1.jpg':
+   actual   : medium_pothole
+   predicted: medium_pothole
 ```
 
-## 🔍 Making Predictions
+## Making Predictions on New Images
 
-Modify the `Program.cs` to predict on new images:
+Add this to your `Program.cs` or a new console app:
 
 ```csharp
-var result = predictionEngine.Predict(new ImageData { ImagePath = "test.jpg" });
-Console.WriteLine($"Predicted severity: {result.PredictedLabel}");
+var ml = new MLContext();
+var model = ml.Model.Load("PotholeSeverityModel.zip", out _);
+var engine = ml.Model.CreatePredictionEngine<ImageData, ImagePrediction>(model);
+
+var output = engine.Predict(new ImageData { ImagePath = "archive/images/test.jpg" });
+Console.WriteLine($"Predicted severity: {output.PredictedLabel}");
 ```
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
-* Dataset provided by **Idan Baruch** via Kaggle under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
-* ML.NET team and contributors for open-source tooling.
+* Dataset provided by Idan Baruch via Kaggle (CC BY 4.0)
+* Built with ML.NET, TensorFlow C API, and open-source tooling
 
-## 📄 License
+## License
 
-This project is open-source under the **MIT License**. The dataset used is licensed separately under **CC BY 4.0**. Please ensure you credit dataset authors if redistributing or adapting the data.
+* Source code: MIT License
+* Dataset: Creative Commons Attribution 4.0 (you must credit the author if reusing)
