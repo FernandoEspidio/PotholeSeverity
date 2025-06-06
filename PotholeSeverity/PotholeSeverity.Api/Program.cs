@@ -1,35 +1,46 @@
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
+using PotholeSeverity.Api.Endpoints;
+using PotholeSeverity.Application.Models.Potholes;
+using Serilog;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
-builder.Services.ConfigureHttpJsonOptions(options =>
+builder.Services.Configure<RouteOptions>(options =>
 {
-    options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
+    options.ConstraintMap["regex"] = typeof(Microsoft.AspNetCore.Routing.Constraints.RegexRouteConstraint);
 });
+
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.JsonSerializerOptions.TypeInfoResolverChain.Insert(0, JsonContext.Default);
+});
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("../Logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .Enrich.FromLogContext()
+    .MinimumLevel.Information()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new() { Title = "My API", Version = "v1" });
+});
+
+builder.Services.AddPotholeSeverityClassifierEndpoints();
 
 var app = builder.Build();
 
-var sampleTodos = new Todo[] {
-    new(1, "Walk the dog"),
-    new(2, "Do the dishes", DateOnly.FromDateTime(DateTime.Now)),
-    new(3, "Do the laundry", DateOnly.FromDateTime(DateTime.Now.AddDays(1))),
-    new(4, "Clean the bathroom"),
-    new(5, "Clean the car", DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
-};
+app.UseSwagger();
+app.UseSwaggerUI();
 
-var todosApi = app.MapGroup("/todos");
-todosApi.MapGet("/", () => sampleTodos);
-todosApi.MapGet("/{id}", (int id) =>
-    sampleTodos.FirstOrDefault(a => a.Id == id) is { } todo
-        ? Results.Ok(todo)
-        : Results.NotFound());
+app.MapPotholeSeverityClassifierEndpoints();
 
 app.Run();
 
-public record Todo(int Id, string? Title, DateOnly? DueBy = null, bool IsComplete = false);
-
-[JsonSerializable(typeof(Todo[]))]
-internal partial class AppJsonSerializerContext : JsonSerializerContext
-{
-
-}
+[JsonSerializable(typeof(Severity))]
+public partial class JsonContext : JsonSerializerContext { }

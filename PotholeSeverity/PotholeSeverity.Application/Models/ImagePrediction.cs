@@ -1,6 +1,6 @@
 using Microsoft.ML.Data;
 
-namespace PotholeSeverity.Classifier;
+namespace PotholeSeverity.Application.Models;
 
 /// <summary>
 /// Prediction output (label + scores).

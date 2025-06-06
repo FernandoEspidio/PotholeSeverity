@@ -1,6 +1,7 @@
 ﻿using System.Xml.Linq;
 using Microsoft.ML;
 using Microsoft.ML.Vision;
+using PotholeSeverity.Application.Models;
 
 namespace PotholeSeverity.Classifier;
 

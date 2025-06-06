@@ -1,4 +1,4 @@
-namespace PotholeSeverity.Classifier;
+namespace PotholeSeverity.Application.Models;
 
 /// <summary>
 /// Represents one image/label row.
