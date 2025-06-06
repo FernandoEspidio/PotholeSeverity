@@ -1,29 +1,9 @@
 ﻿using System.Xml.Linq;
 using Microsoft.ML;
-using Microsoft.ML.Data;
 using Microsoft.ML.Vision;
+using PotholeSeverity.Application.Models;
 
 namespace PotholeSeverity.Classifier;
-
-/// <summary>
-/// Represents one image/label row.
-/// </summary>
-public sealed class ImageData
-{
-    public string ImagePath { get; set; } = default!;
-    public string Label { get; set; } = default!;
-}
-
-/// <summary>
-/// Prediction output (label + scores).
-/// </summary>
-public sealed class ImagePrediction
-{
-    [ColumnName("PredictedLabel")]
-    public string PredictedLabel { get; set; } = default!;
-
-    public float[] Score { get; set; } = default!;
-}
 
 public static class Program
 {
