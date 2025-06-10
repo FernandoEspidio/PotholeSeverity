@@ -2,6 +2,8 @@
 
 PotholeSeverity/PotholeSeverity.Classifier/archive/
 PotholeSeverity/PotholeSeverity.Classifier/PotholeSeverityModel.onnx
+PotholeSeverity/PotholeSeverity.Application/Models/PotholeSeverityModel.onnx
+PotholeSeverity/PotholeSeverity.Api/Models/PotholeSeverityModel.onnx
 Logs/
 
 ## Ignore Visual Studio temporary files, build results, and

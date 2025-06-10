@@ -78,6 +78,13 @@ PotholeSeverity/PotholeSeverity.Classifier/PotholeSeverityModel.onnx
 
 ✅ You are now ready to run the C# ONNX-powered inference.
 
+To use the service project API, you will have to copy the ONNX model to the service project folder:
+
+```bash
+cp PotholeSeverity.Classifier/PotholeSeverityModel.onnx PotholeSeverity.Application/Models/
+cp PotholeSeverity.Classifier/PotholeSeverityModel.onnx PotholeSeverity.Api/Models/
+```
+
 ---
 
 ## 🖥️ Running the Inference App (C#)
