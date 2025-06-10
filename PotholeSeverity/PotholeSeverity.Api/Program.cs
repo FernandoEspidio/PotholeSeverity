@@ -14,7 +14,9 @@ builder.Services.Configure<RouteOptions>(options =>
 builder.Services.Configure<JsonOptions>(options =>
 {
     options.JsonSerializerOptions.TypeInfoResolverChain.Insert(0, JsonContext.Default);
+    options.JsonSerializerOptions.Converters.Add(new SeverityEnumConverter());
 });
+
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()

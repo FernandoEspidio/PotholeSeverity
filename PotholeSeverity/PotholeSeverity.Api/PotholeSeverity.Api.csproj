@@ -23,11 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="PotholeSeverityModel.zip">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="libtensorflow-cpu-linux-x86_64-2.3.0.tar.gz">
+    <None Update="Models\PotholeSeverityModel.onnx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
 </Project>

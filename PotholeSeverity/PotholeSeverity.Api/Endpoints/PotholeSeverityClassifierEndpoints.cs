@@ -39,7 +39,7 @@ public static class PotholeSeverityClassifierEndpoints
         .DisableAntiforgery();
     }
 
-    public static async Task<IResult> ClassifyPothole(IPotholeSeverityClassifier classifier, IFormFile file, CancellationToken cancellationToken)
+    public static async Task<IResult> ClassifyPothole(IPotholeSeverityClassifierService classifier, IFormFile file, CancellationToken cancellationToken)
     {
         if (file.Length == 0)
         {
