@@ -12,6 +12,6 @@ public static class ApplicationServiceExtensions
     public static void AddApplicationServices(this IServiceCollection services)
     {
         // Register the PotholeSeverityClassifier as a scoped service
-        services.AddScoped<IPotholeSeverityClassifier, PotholeSeverityClassifier>();
+        services.AddScoped<IPotholeSeverityClassifierService, PotholeSeverityClassifierService>();
     }
 }

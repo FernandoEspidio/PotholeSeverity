@@ -5,7 +5,7 @@ namespace PotholeSeverity.Application.Services.Potholes;
 /// <summary>
 /// Interface for classifying the severity of potholes based on images.
 /// </summary>
-public interface IPotholeSeverityClassifier
+public interface IPotholeSeverityClassifierService
 {
     /// <summary>
     /// Classifies the severity of a pothole based on its image.
