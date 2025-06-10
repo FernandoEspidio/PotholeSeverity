@@ -1,18 +1,24 @@
-# Pothole Severity Classification with ML.NET
+Absolutely — here is the updated README written directly in Markdown format (without code blocks):
 
-This project is an AI-powered pothole severity classifier built using **ML.NET** on **Linux (no Visual Studio required)**.
-It uses transfer learning to classify road images containing potholes into three severity levels: **low**, **medium**, and **high**.
-The model helps road-maintenance teams prioritize repairs based on risk.
+---
 
-## Project Overview
+# Pothole Severity Classification with ML.NET (ONNX Inference)
+
+This project is an AI-powered pothole severity classifier built using **ML.NET** and **ONNX inference** on **Linux (no Visual Studio required)**.
+The model uses a pretrained ResNet and classifies potholes into three severity levels: **low**, **medium**, and **high** — allowing road maintenance teams to prioritize repairs efficiently.
+
+---
+
+## 🗂️ Project Overview
 
 * **Input**: Road-surface images (JPG / PNG)
 * **Output**: Predicted pothole severity label – `low`, `medium`, or `high`
-* **Framework**: ML.NET
-* **Platform**: Linux, using the .NET CLI
-* **Model**: Image classification (ResNet-based transfer learning)
+* **Inference**: ONNX model (trained with PyTorch)
+* **App Runtime**: .NET 6+ CLI, cross-platform
 
-## Dataset
+---
+
+## 📦 Dataset
 
 * **Source** – Annotated Potholes with Severity Levels by Idan Baruch on Kaggle
   [https://www.kaggle.com/datasets/idanbaru/annotated-potholes-with-severity-levels](https://www.kaggle.com/datasets/idanbaru/annotated-potholes-with-severity-levels)
@@ -22,106 +28,108 @@ The model helps road-maintenance teams prioritize repairs based on risk.
 Baruch, I. “Annotated Potholes with Severity Levels.” Kaggle, 2023.
 Images were reorganized automatically for training; no other dataset content was modified.
 
-## Installation & Setup (Linux)
+---
+
+## 🚀 Installation & Setup (Linux)
 
 ### 1. Prerequisites
 
-* .NET SDK 6.0 or later
-* Optional: build tools (`gcc`, `make`) if you need to manually install TensorFlow libs
+* Python 3.10+ with `torch`, `torchvision`, `onnx`, `onnxruntime`
+* .NET 6.0+ SDK installed (`dotnet --version` to check)
 
-### 2. Create the project & install ML.NET + TensorFlow runtime
+### 2. Clone and prepare the dataset
+
+Download the dataset and place it like this:
+
+```
+PotholeSeverity/
+├── PotholeSeverity.Classifier/
+├── PotholeSeverity.Application/
+└── archive/
+    ├── images/        # 717 JPGs
+    └── annotations/   # 717 XMLs
+```
+
+---
+
+## 🧠 Model Training (Python → ONNX)
+
+Before you run any .NET code, you **must generate the ONNX model file** using Python:
+
+### 1. Set up Python environment
+
+From the `PotholeSeverity/PotholeSeverityClassifier` folder:
 
 ```bash
-dotnet new console -n PotholeSeverity.Classifier
-cd PotholeSeverity.Classifier
-
-# ML.NET packages
-dotnet add package Microsoft.ML
-dotnet add package Microsoft.ML.ImageAnalytics
-dotnet add package Microsoft.ML.Vision
-
-# Native TensorFlow C bindings
-dotnet add package SciSharp.TensorFlow.Redist --version 2.3.0
+pip install torch torchvision onnx onnxruntime pillow lxml
 ```
 
-### 3. TensorFlow setup (if errors persist)
-
-If you still get `libtensorflow.so not found`:
-
-Option 1 – Use the NuGet package (above), and confirm this file exists after `dotnet build`:
-
-```
-bin/Debug/net*/runtimes/linux-x64/native/libtensorflow.so
-```
-
-Option 2 – Install TensorFlow manually system-wide:
+### 2. Run the training script
 
 ```bash
-wget https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-2.3.0.tar.gz
-sudo tar -C /usr/local -xzf libtensorflow-cpu-linux-x86_64-2.3.0.tar.gz
-sudo ldconfig
+python3 train_pothole_classifier.py
 ```
 
-Then make sure `/usr/local/lib` is in your `LD_LIBRARY_PATH`.
-
-## Data Preparation
-
-1. Download the Kaggle dataset and extract it to the root of your project:
+This will generate the ONNX model at:
 
 ```
-archive/
-├── images/        # 717 image files
-└── annotations/   # 717 XML files
+PotholeSeverity/PotholeSeverity.Classifier/PotholeSeverityModel.onnx
 ```
 
-2. Do **not** move or relabel files manually.
+✅ You are now ready to run the C# ONNX-powered inference.
 
-Our `Program.cs` parses each XML annotation file and auto-assigns the highest-severity pothole label found in that image.
+---
 
-## Training
+## 🖥️ Running the Inference App (C#)
 
-Run the project:
+From the project root:
 
 ```bash
+cd PotholeSeverity/PotholeSeverity.Classifier
 dotnet run
 ```
 
-Sample output from a real run:
+The app will:
+
+* Load the ONNX model
+* Preprocess a sample image
+* Output the predicted severity level
+
+Example output:
 
 ```
-Loaded 701 annotated images.
-Training… (this can take several minutes on CPU)
-✔ Training finished.
-
-Micro-Accuracy : 78.38%
-Macro-Accuracy : 54.58%
-LogLoss        : 0.7024
-Model saved to PotholeSeverityModel.zip
-
-Sample prediction for 'img-1.jpg':
-   actual   : medium_pothole
-   predicted: medium_pothole
+Predicting pothole severity for: pothole_001.jpg
+Predicted severity: major_pothole (index 2)
 ```
 
-## Making Predictions on New Images
+---
 
-Add this to your `Program.cs` or a new console app:
+## 🧪 Prediction on Custom Images
 
-```csharp
-var ml = new MLContext();
-var model = ml.Model.Load("PotholeSeverityModel.zip", out _);
-var engine = ml.Model.CreatePredictionEngine<ImageData, ImagePrediction>(model);
+To classify another image (e.g., `test.jpg`), drop it into `archive/images/`, then either edit `Program.cs` to point to it or extend the app to read from arguments.
 
-var output = engine.Predict(new ImageData { ImagePath = "archive/images/test.jpg" });
-Console.WriteLine($"Predicted severity: {output.PredictedLabel}");
-```
+---
 
-## Acknowledgments
+## 🛠️ Notes
+
+* The ONNX model uses standard PyTorch preprocessing: Resize → Normalize → NCHW.
+* Image preprocessing is done using [ImageSharp](https://github.com/SixLabors/ImageSharp) for full Linux/macOS support.
+* The app **does not** train any models — it performs pure inference using the ONNX model.
+
+---
+
+## ✅ Acknowledgments
 
 * Dataset provided by Idan Baruch via Kaggle (CC BY 4.0)
-* Built with ML.NET, TensorFlow C API, and open-source tooling
+* Built using PyTorch, ONNX Runtime, .NET CLI, and open-source tooling
 
-## License
+---
+
+## 📝 License
 
 * Source code: MIT License
-* Dataset: Creative Commons Attribution 4.0 (you must credit the author if reusing)
+* Dataset: Creative Commons Attribution 4.0 (CC BY 4.0)
+
+---
+
+Let me know if you want this saved as a file or updated directly in your repo.

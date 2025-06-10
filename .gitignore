@@ -1,11 +1,7 @@
 ## Ignore project files
 
 PotholeSeverity/PotholeSeverity.Classifier/archive/
-
-PotholeSeverity/PotholeSeverity.Classifier/PotholeSeverityModel.zip
-PotholeSeverity/PotholeSeverity.Classifier/libtensorflow-cpu-linux-x86_64-2.3.0.tar.gz
-PotholeSeverity/PotholeSeverity.Api/PotholeSeverityModel.zip
-PotholeSeverity/PotholeSeverity.Api/libtensorflow-cpu-linux-x86_64-2.3.0.tar.gz
+PotholeSeverity/PotholeSeverity.Classifier/PotholeSeverityModel.onnx
 Logs/
 
 ## Ignore Visual Studio temporary files, build results, and
