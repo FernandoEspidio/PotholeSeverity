@@ -1,32 +1,38 @@
-Absolutely — here is the updated README written directly in Markdown format (without code blocks):
-
----
-
 # Pothole Severity Classification with ML.NET (ONNX Inference)
 
-This project is an AI-powered pothole severity classifier built using **ML.NET** and **ONNX inference** on **Linux (no Visual Studio required)**.
-The model uses a pretrained ResNet and classifies potholes into three severity levels: **low**, **medium**, and **high** — allowing road maintenance teams to prioritize repairs efficiently.
+This project is an AI-powered pothole severity and detection classifier built using **ML.NET** and **ONNX inference** on **Linux (no Visual Studio required)**.
+It contains two models:
+
+1. A **severity classifier** for prioritizing road maintenance.
+2. A **binary detector** to check if a pothole is present or not.
+
+Both models are trained in Python with PyTorch and exported to ONNX for .NET-based inference.
 
 ---
 
 ## 🗂️ Project Overview
 
 * **Input**: Road-surface images (JPG / PNG)
-* **Output**: Predicted pothole severity label – `low`, `medium`, or `high`
-* **Inference**: ONNX model (trained with PyTorch)
+* **Output**:
+
+  * Severity mode: `low`, `medium`, `high`
+  * Binary mode: `pothole` or `normal`
+* **Inference**: ONNX models (trained with PyTorch)
 * **App Runtime**: .NET 6+ CLI, cross-platform
 
 ---
 
-## 📦 Dataset
+## 📦 Datasets
+
+### 🔸 Severity Classification
 
 * **Source** – Annotated Potholes with Severity Levels by Idan Baruch on Kaggle
   [https://www.kaggle.com/datasets/idanbaru/annotated-potholes-with-severity-levels](https://www.kaggle.com/datasets/idanbaru/annotated-potholes-with-severity-levels)
-* **License** – Creative Commons Attribution 4.0 (CC BY 4.0)
 
-**Attribution**
-Baruch, I. “Annotated Potholes with Severity Levels.” Kaggle, 2023.
-Images were reorganized automatically for training; no other dataset content was modified.
+### 🔸 Binary Pothole Detection
+
+* **Source** – Pothole Detection Dataset by Atulya Kumar on Kaggle
+  [https://www.kaggle.com/datasets/atulyakumar98/pothole-detection-dataset](https://www.kaggle.com/datasets/atulyakumar98/pothole-detection-dataset)
 
 ---
 
@@ -37,53 +43,65 @@ Images were reorganized automatically for training; no other dataset content was
 * Python 3.10+ with `torch`, `torchvision`, `onnx`, `onnxruntime`
 * .NET 6.0+ SDK installed (`dotnet --version` to check)
 
-### 2. Clone and prepare the dataset
+### 2. Directory structure
 
-Download the dataset and place it like this:
+Place the datasets like this:
 
 ```
 PotholeSeverity/
 ├── PotholeSeverity.Classifier/
 ├── PotholeSeverity.Application/
-└── archive/
-    ├── images/        # 717 JPGs
-    └── annotations/   # 717 XMLs
+├── archive/         # severity dataset
+│   ├── images/
+│   └── annotations/
+└── archive1/        # binary detection dataset
+    ├── potholes/
+    └── normal/
 ```
 
 ---
 
 ## 🧠 Model Training (Python → ONNX)
 
-Before you run any .NET code, you **must generate the ONNX model file** using Python:
+### 🔹 Severity Classifier
 
-### 1. Set up Python environment
-
-From the `PotholeSeverity/PotholeSeverityClassifier` folder:
+From the `PotholeSeverityClassifier` folder:
 
 ```bash
 pip install torch torchvision onnx onnxruntime pillow lxml
-```
-
-### 2. Run the training script
-
-```bash
 python3 train_pothole_classifier.py
 ```
 
-This will generate the ONNX model at:
+This produces:
 
 ```
-PotholeSeverity/PotholeSeverity.Classifier/PotholeSeverityModel.onnx
+PotholeSeverity.Classifier/PotholeSeverityModel.onnx
 ```
 
-✅ You are now ready to run the C# ONNX-powered inference.
+### 🔹 Binary Detector (Pothole Presence)
 
-To use the service project API, you will have to copy the ONNX model to the service project folder:
+For basic detection (pothole vs. no pothole):
+
+```bash
+python3 train_pothole_detector.py
+```
+
+This produces:
+
+```
+PotholeSeverity.Classifier/PotholeDetector.onnx
+```
+
+✅ Once models are trained, you're ready for inference.
+
+To use these with .NET:
 
 ```bash
 cp PotholeSeverity.Classifier/PotholeSeverityModel.onnx PotholeSeverity.Application/Models/
-cp PotholeSeverity.Classifier/PotholeSeverityModel.onnx PotholeSeverity.Api/Models/
+cp PotholeSeverity.Classifier/PotholeDetector.onnx PotholeSeverity.Application/Models/
 ```
+
+(Repeat for `PotholeSeverity.Api/Models/` if needed)
 
 ---
 
@@ -92,51 +110,49 @@ cp PotholeSeverity.Classifier/PotholeSeverityModel.onnx PotholeSeverity.Api/Mode
 From the project root:
 
 ```bash
-cd PotholeSeverity/PotholeSeverity.Classifier
+cd PotholeSeverity/PotholeSeverity.Application
 dotnet run
 ```
 
 The app will:
 
-* Load the ONNX model
-* Preprocess a sample image
-* Output the predicted severity level
+* Load the specified ONNX model
+* Preprocess an input image
+* Output the predicted class
 
-Example output:
+Example output (binary mode):
 
 ```
-Predicting pothole severity for: pothole_001.jpg
-Predicted severity: major_pothole (index 2)
+Predicting pothole presence for: sample.jpg
+Prediction: pothole (index 1)
 ```
 
 ---
 
 ## 🧪 Prediction on Custom Images
 
-To classify another image (e.g., `test.jpg`), drop it into `archive/images/`, then either edit `Program.cs` to point to it or extend the app to read from arguments.
+To classify custom images, place them into the appropriate dataset folder (`archive/images/` or `archive1/potholes/`) and update the path in the application or extend it to accept arguments.
 
 ---
 
 ## 🛠️ Notes
 
-* The ONNX model uses standard PyTorch preprocessing: Resize → Normalize → NCHW.
-* Image preprocessing is done using [ImageSharp](https://github.com/SixLabors/ImageSharp) for full Linux/macOS support.
-* The app **does not** train any models — it performs pure inference using the ONNX model.
+* The models use standard ResNet18 with transfer learning.
+* Preprocessing: Resize to 224×224, normalize to ImageNet stats.
+* Inference is handled via ONNX Runtime in both Python and C#.
+* Image loading in .NET uses [ImageSharp](https://github.com/SixLabors/ImageSharp) for cross-platform compatibility.
 
 ---
 
 ## ✅ Acknowledgments
 
-* Dataset provided by Idan Baruch via Kaggle (CC BY 4.0)
-* Built using PyTorch, ONNX Runtime, .NET CLI, and open-source tooling
+* Dataset (severity): Idan Baruch, Kaggle (CC BY 4.0)
+* Dataset (binary): Atulya Kumar, Kaggle (CC BY 4.0)
+* Tools: PyTorch, ONNX, ML.NET, ONNX Runtime, .NET CLI
 
 ---
 
 ## 📝 License
 
 * Source code: MIT License
-* Dataset: Creative Commons Attribution 4.0 (CC BY 4.0)
-
----
-
-Let me know if you want this saved as a file or updated directly in your repo.
+* Datasets: Creative Commons Attribution 4.0 (CC BY 4.0)
