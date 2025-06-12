@@ -1,9 +1,21 @@
 ## Ignore project files
 
+### Ignore training and test data
 PotholeSeverity/PotholeSeverity.Classifier/archive/
+PotholeSeverity/PotholeSeverity.Classifier/archive1/
+
+### Ignore model files
 PotholeSeverity/PotholeSeverity.Classifier/PotholeSeverityModel.onnx
+PotholeSeverity/PotholeSeverity.Classifier/PotholeDetector.onnx
+
+### Ignore API model files
 PotholeSeverity/PotholeSeverity.Application/Models/PotholeSeverityModel.onnx
 PotholeSeverity/PotholeSeverity.Api/Models/PotholeSeverityModel.onnx
+
+PotholeSeverity/PotholeSeverity.Application/Models/PotholeDetector.onnx
+PotholeSeverity/PotholeSeverity.Api/Models/PotholeDetector.onnx
+
+### Ignore build and output directories
 Logs/
 
 ## Ignore Visual Studio temporary files, build results, and
