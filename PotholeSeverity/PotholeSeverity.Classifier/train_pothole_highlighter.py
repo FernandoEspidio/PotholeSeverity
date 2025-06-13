@@ -7,7 +7,6 @@ import torchvision
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from torchvision.transforms import functional as F
 from torch.utils.data import Dataset, DataLoader, random_split
-import onnx
 
 # ---- Config ----
 IMAGE_DIR = Path("archive/images")
@@ -82,41 +81,60 @@ val_loader = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, collate_fn
 model = fasterrcnn_resnet50_fpn(pretrained=True)
 in_features = model.roi_heads.box_predictor.cls_score.in_features
 model.roi_heads.box_predictor = torchvision.models.detection.faster_rcnn.FastRCNNPredictor(in_features, NUM_CLASSES)
-model.train()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
-# ---- Training ----
-print("Training...")
-for epoch in range(NUM_EPOCHS):
-    model.train()
-    epoch_loss = 0
-    for batch_idx, (imgs, targets) in enumerate(train_loader):
-        imgs = [img.to(device) for img in imgs]
-        targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
-        loss_dict = model(imgs, targets)
-        losses = sum(loss for loss in loss_dict.values())
+# ---- Training (commented if already trained) ----
+# print("Training...")
+# for epoch in range(NUM_EPOCHS):
+#     model.train()
+#     epoch_loss = 0
+#     for batch_idx, (imgs, targets) in enumerate(train_loader):
+#         imgs = [img.to(device) for img in imgs]
+#         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
+#         loss_dict = model(imgs, targets)
+#         losses = sum(loss for loss in loss_dict.values())
+# 
+#         optimizer.zero_grad()
+#         losses.backward()
+#         optimizer.step()
+# 
+#         epoch_loss += losses.item()
+#         print(f"Epoch {epoch+1} | Batch {batch_idx+1}/{len(train_loader)} | Loss: {losses.item():.4f}")
+# 
+#     print(f"Epoch {epoch+1}/{NUM_EPOCHS} - Total Loss: {epoch_loss:.4f}")
 
-        optimizer.zero_grad()
-        losses.backward()
-        optimizer.step()
+# ---- Wrapper for ONNX ----
+class WrappedFasterRCNN(torch.nn.Module):
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
 
-        epoch_loss += losses.item()
-        print(f"Epoch {epoch+1} | Batch {batch_idx+1}/{len(train_loader)} | Loss: {losses.item():.4f}")
-
-    print(f"Epoch {epoch+1}/{NUM_EPOCHS} - Total Loss: {epoch_loss:.4f}")
+    def forward(self, images):
+        outputs = self.model(images)
+        boxes = [o["boxes"] for o in outputs]
+        labels = [o["labels"] for o in outputs]
+        scores = [o["scores"] for o in outputs]
+        return boxes, labels, scores
 
 # ---- Export to ONNX ----
 print(f"\nExporting model to {MODEL_OUT}...")
 model.eval()
-dummy_input = [torch.randn(3, 720, 720).to(device)]
-torch.onnx.export(
-    model, dummy_input, MODEL_OUT,
-    input_names=["input"],
-    output_names=["boxes", "labels", "scores"],
-    dynamic_axes={"input": {0: "batch"}},
-    opset_version=11
-)
+wrapped_model = WrappedFasterRCNN(model)
+
+sample_loader = DataLoader(dataset, batch_size=1, collate_fn=lambda x: tuple(zip(*x)))
+imgs, _ = next(iter(sample_loader))
+imgs = [img.to(device) for img in imgs]
+
+with torch.no_grad():
+    torch.onnx.export(
+        wrapped_model, (imgs,), MODEL_OUT,
+        input_names=["input"],
+        output_names=["boxes", "labels", "scores"],
+        opset_version=11,
+        dynamic_axes={"input": {0: "batch"}}
+    )
+
 print("✅ ONNX export complete.")
