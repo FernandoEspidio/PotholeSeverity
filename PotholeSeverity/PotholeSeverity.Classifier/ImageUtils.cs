@@ -32,5 +32,33 @@ namespace PotholeSeverity.Classifier
             }
             return tensor;
         }
+
+        internal static DenseTensor<float> LoadImageAs3DTensor(string imagePath, int size = 640)
+        {
+            using var image = Image.Load<Rgb24>(imagePath);
+
+            // Resize if needed
+            image.Mutate(x => x.Resize(size, size));
+
+            // Create a 3D tensor [channels, height, width]
+            var tensor = new DenseTensor<float>(new[] { 3, size, size });
+
+            // Copy the image data to the tensor
+            image.ProcessPixelRows(accessor =>
+            {
+                for (int y = 0; y < accessor.Height; y++)
+                {
+                    var pixelRow = accessor.GetRowSpan(y);
+                    for (int x = 0; x < accessor.Width; x++)
+                    {
+                        tensor[0, y, x] = pixelRow[x].R / 255.0f; // R channel
+                        tensor[1, y, x] = pixelRow[x].G / 255.0f; // G channel
+                        tensor[2, y, x] = pixelRow[x].B / 255.0f; // B channel
+                    }
+                }
+            });
+
+            return tensor;
+        }
     }
 }

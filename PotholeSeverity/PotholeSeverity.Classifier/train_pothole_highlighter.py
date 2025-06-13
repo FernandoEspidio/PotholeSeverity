@@ -106,35 +106,59 @@ optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 # 
 #     print(f"Epoch {epoch+1}/{NUM_EPOCHS} - Total Loss: {epoch_loss:.4f}")
 
-# ---- Wrapper for ONNX ----
 class WrappedFasterRCNN(torch.nn.Module):
     def __init__(self, model):
         super().__init__()
         self.model = model
-
-    def forward(self, images):
-        outputs = self.model(images)
-        boxes = [o["boxes"] for o in outputs]
-        labels = [o["labels"] for o in outputs]
-        scores = [o["scores"] for o in outputs]
-        return boxes, labels, scores
+        
+    def forward(self, image):
+        # The model expects a list of images, but we want to export with a single image input
+        predictions = self.model([image])
+        
+        # Extract the detection results from the first (and only) image
+        boxes = predictions[0]['boxes']
+        scores = predictions[0]['scores']
+        labels = predictions[0]['labels']
+        
+        # Combine results into a single tensor for easier handling in C#
+        # Format: [x1, y1, x2, y2, confidence, class_id]
+        num_detections = boxes.shape[0]
+        detections = torch.zeros((num_detections, 6), device=boxes.device)
+        
+        if num_detections > 0:
+            detections[:, 0:4] = boxes  # x1, y1, x2, y2
+            detections[:, 4] = scores   # confidence scores
+            detections[:, 5] = labels.float()  # class indices
+            
+        return detections
 
 # ---- Export to ONNX ----
 print(f"\nExporting model to {MODEL_OUT}...")
 model.eval()
 wrapped_model = WrappedFasterRCNN(model)
 
+
 sample_loader = DataLoader(dataset, batch_size=1, collate_fn=lambda x: tuple(zip(*x)))
-imgs, _ = next(iter(sample_loader))
-imgs = [img.to(device) for img in imgs]
+img, _ = next(iter(sample_loader))
+img = img[0].to(device)  # Get a single image tensor
+
+# Print the shape to understand what we're working with
+print(f"Input tensor shape: {img.shape}")
 
 with torch.no_grad():
+    # Simplify the dynamic axes configuration
     torch.onnx.export(
-        wrapped_model, (imgs,), MODEL_OUT,
+        wrapped_model, 
+        img, 
+        MODEL_OUT,
         input_names=["input"],
-        output_names=["boxes", "labels", "scores"],
+        output_names=["detections"],
         opset_version=11,
-        dynamic_axes={"input": {0: "batch"}}
+        # Only define dynamic axes that actually exist in the tensor
+        dynamic_axes={
+            "input": {0: "channels", 1: "height", 2: "width"},
+            "detections": {0: "num_detections"}
+        }
     )
 
 print("✅ ONNX export complete.")
