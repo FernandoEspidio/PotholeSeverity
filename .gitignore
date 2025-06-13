@@ -7,10 +7,14 @@ PotholeSeverity/PotholeSeverity.Classifier/archive1/
 ### Ignore model files
 PotholeSeverity/PotholeSeverity.Classifier/PotholeSeverityModel.onnx
 PotholeSeverity/PotholeSeverity.Classifier/PotholeDetector.onnx
+PotholeSeverity/PotholeSeverity.Classifier/PotholeHighlighter.onnx
 
 ### Ignore API model files
 PotholeSeverity/PotholeSeverity.Application/Models/PotholeSeverityModel.onnx
 PotholeSeverity/PotholeSeverity.Api/Models/PotholeSeverityModel.onnx
+
+PotholeSeverity/PotholeSeverity.Application/Models/PotholeHighlighter.onnx
+PotholeSeverity/PotholeSeverity.Api/Models/PotholeHighlighter.onnx
 
 PotholeSeverity/PotholeSeverity.Application/Models/PotholeDetector.onnx
 PotholeSeverity/PotholeSeverity.Api/Models/PotholeDetector.onnx

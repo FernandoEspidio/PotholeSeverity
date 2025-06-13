@@ -26,6 +26,10 @@
       <Link>Models\PotholeDetector.onnx</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="..\PotholeSeverity.Application\Models\PotholeHighlighter.onnx">
+      <Link>Models\PotholeHighlighter.onnx</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

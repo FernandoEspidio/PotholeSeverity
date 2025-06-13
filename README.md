@@ -5,6 +5,7 @@ It contains two models:
 
 1. A **severity classifier** for prioritizing road maintenance.
 2. A **binary detector** to check if a pothole is present or not.
+3. A **highlighter** to draw bounding boxes around detected potholes.
 
 Both models are trained in Python with PyTorch and exported to ONNX for .NET-based inference.
 
@@ -17,6 +18,7 @@ Both models are trained in Python with PyTorch and exported to ONNX for .NET-bas
 
   * Severity mode: `low`, `medium`, `high`
   * Binary mode: `pothole` or `normal`
+  * Bounding box coordinates for detected potholes
 * **Inference**: ONNX models (trained with PyTorch)
 * **App Runtime**: .NET 6+ CLI, cross-platform
 
@@ -33,6 +35,11 @@ Both models are trained in Python with PyTorch and exported to ONNX for .NET-bas
 
 * **Source** – Pothole Detection Dataset by Atulya Kumar on Kaggle
   [https://www.kaggle.com/datasets/atulyakumar98/pothole-detection-dataset](https://www.kaggle.com/datasets/atulyakumar98/pothole-detection-dataset)
+
+### 🔸 Bounding Box Detection
+
+* **Source** – Annotated Potholes with Severity Levels by Idan Baruch on Kaggle
+  [https://www.kaggle.com/datasets/idanbaru/annotated-potholes-with-severity-levels](https://www.kaggle.com/datasets/idanbaru/annotated-potholes-with-severity-levels)
 
 ---
 
@@ -51,7 +58,7 @@ Place the datasets like this:
 PotholeSeverity/
 ├── PotholeSeverity.Classifier/
 ├── PotholeSeverity.Application/
-├── archive/         # severity dataset
+├── archive/         # severity and highlighter dataset
 │   ├── images/
 │   └── annotations/
 └── archive1/        # binary detection dataset
@@ -78,6 +85,12 @@ This produces:
 PotholeSeverity.Classifier/PotholeSeverityModel.onnx
 ```
 
+This produces:
+
+```
+PotholeSeverity.Classifier/PotholeDetector.onnx
+```
+
 ### 🔹 Binary Detector (Pothole Presence)
 
 For basic detection (pothole vs. no pothole):
@@ -86,10 +99,15 @@ For basic detection (pothole vs. no pothole):
 python3 train_pothole_detector.py
 ```
 
+### 🔹 Pothole Highlighter (Bounding Box Detection)
+
+```bash
+python3 train_pothole_highlighter.py
+```
 This produces:
 
 ```
-PotholeSeverity.Classifier/PotholeDetector.onnx
+PotholeSeverity.Classifier/PotholeHighlighter.onnx
 ```
 
 ✅ Once models are trained, you're ready for inference.

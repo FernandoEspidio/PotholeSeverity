@@ -15,5 +15,17 @@ public static class Program
         // ---- Binary Detection ----
         var (detIdx, detLabel) = PotholeDetector.Predict(SampleImage);
         Console.WriteLine($"Pothole presence    : {detLabel} (index {detIdx})\n");
+
+        // ---- Object Detection (Bounding Boxes) ----
+        var boxes = PotholeHighlighter.Predict(SampleImage);
+        Console.WriteLine("Bounding boxes detected:");
+        foreach (var box in boxes)
+        {
+            Console.WriteLine($"  X={box.X}, Y={box.Y}, W={box.Width}, H={box.Height}, Conf={box.Confidence:F2}");
+        }
+        if (boxes.Count == 0)
+        {
+            Console.WriteLine("  No potholes detected.");
+        }
     }
 }
