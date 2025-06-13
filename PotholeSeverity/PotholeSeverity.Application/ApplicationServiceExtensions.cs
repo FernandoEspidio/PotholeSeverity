@@ -11,7 +11,9 @@ public static class ApplicationServiceExtensions
     /// <param name="services">The service collection to add services to.</param>
     public static void AddApplicationServices(this IServiceCollection services)
     {
-        // Register the PotholeSeverityClassifier as a scoped service
+        // Register services as scoped services
         services.AddScoped<IPotholeSeverityClassifierService, PotholeSeverityClassifierService>();
+        services.AddScoped<IPotholeDetectorService, PotholeDetectorService>();
+        services.AddScoped<IPotholeHighlighterService, PotholeHighlighterService>();
     }
 }
