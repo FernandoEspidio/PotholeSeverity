@@ -29,5 +29,10 @@ namespace PotholeSeverity.Application.Models
         /// Gets or sets the confidence score of the bounding box.
         /// </summary>
         public float Confidence { get; set; }
+
+        /// <summary>
+        /// Gets or sets the class index of the detected object.
+        /// </summary>
+        public int ClassIndex { get; set; }
     }
 }

@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using PotholeSeverity.Api.Endpoints;
+using PotholeSeverity.Application.Models;
 using PotholeSeverity.Application.Models.Potholes;
 using Serilog;
 
@@ -45,4 +47,6 @@ app.MapPotholeSeverityClassifierEndpoints();
 app.Run();
 
 [JsonSerializable(typeof(Severity))]
+[JsonSerializable(typeof(List<BoundingBox>))]
+[JsonSerializable(typeof(PotholeSeverity.Api.Models.PotholeSeverityClassifierEndpoints.DetectionResult))]
 public partial class JsonContext : JsonSerializerContext { }
